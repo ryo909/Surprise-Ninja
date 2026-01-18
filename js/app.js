@@ -141,86 +141,120 @@ function renderResult(result) {
 // --- UI Actions ---
 
 // 1. Entry -> Result
-document.getElementById('btn-open-scroll').addEventListener('click', async (e) => {
-    e.preventDefault();
-    // Debug Alert 1
-    // alert("DEBUG: Button clicked"); 
-    console.log("Button clicked: btn-open-scroll");
+// --- Debug Utils ---
+function debugLog(msg) {
+    const el = document.getElementById('debug-console');
+    if (el) {
+        const time = new Date().toLocaleTimeString();
+        el.innerHTML = `[${time}] ${msg}<br>` + el.innerHTML;
+    }
+    console.log(msg);
+}
 
-    try {
-        const activityInput = document.getElementById('activity-input');
-        const activity = activityInput.value.trim();
+// Log Load
+window.addEventListener('DOMContentLoaded', () => {
+    debugLog(`Loaded: v=${new Date().toISOString()}`);
 
-        console.log("Activity value:", activity);
+    const btn = document.querySelector('#screen-entry #btn-open-scroll');
+    const resultScreen = document.getElementById('screen-result');
+    debugLog(`Check Elements: Btn=${btn ? 'FOUND' : 'MISSING'}, Result=${resultScreen ? 'FOUND' : 'MISSING'}`);
+});
+
+
+// 1. Entry -> Result
+// Scoped Selector to ensure unique button
+const entryBtn = document.querySelector('#screen-entry #btn-open-scroll');
+
+if (entryBtn) {
+    entryBtn.addEventListener('click', async (e) => {
+        e.preventDefault(); // Stop form submit
+        e.stopPropagation(); // Stop bubbling
+
+        debugLog("Event: Clicked 'btn-open-scroll'");
+
+        // --- 1. Force Screen Switch Test (Priority) ---
+        // Get Elements again to be sure
+        const screenEntry = document.getElementById('screen-entry');
+        const screenResult = document.getElementById('screen-result');
+
+        if (!screenEntry || !screenResult) {
+            debugLog("CRITICAL: Screen elements missing!");
+            alert("Error: Screen elements missing");
+            return;
+        }
+
+        // --- Validation ---
+        const activityInput = document.querySelector('#screen-entry #activity-input');
+        const activity = activityInput ? activityInput.value.trim() : "";
+        debugLog(`Activity Input: '${activity}'`);
 
         if (!activity) {
-            console.warn("Validation failed: Empty activity");
-            alert("DEBUG: Validation failed (Empty)"); // Debug
-            // UI Error Feedback
-            activityInput.style.borderColor = "#db3b3b";
-            activityInput.style.backgroundColor = "rgba(219, 59, 59, 0.1)";
-            activityInput.focus();
-
-            // Shake effect (simple CSS class toggle)
-            activityInput.classList.add('shake');
-            setTimeout(() => activityInput.classList.remove('shake'), 500);
-            return;
-        } else {
-            // Reset style
-            activityInput.style.borderColor = "#555";
-            activityInput.style.backgroundColor = "#333";
+            debugLog("Validation: Empty activity. Shaking.");
+            if (activityInput) {
+                activityInput.classList.add('shake');
+                setTimeout(() => activityInput.classList.remove('shake'), 500);
+                activityInput.focus();
+            }
+            return; // Stop if empty
         }
 
-        const category = document.getElementById('category-select').value;
+        // --- EXECUTION ---
+        try {
+            debugLog("Action: Starting Gacha Logic...");
 
-        // Button text change for feedback
-        const btn = document.getElementById('btn-open-scroll');
-        const originalText = btn.innerHTML;
-        btn.textContent = "【侵入検知】現場を特定…"; // Simple text replace for now
-        btn.disabled = true;
+            // Get Category
+            const catSelect = document.querySelector('#screen-entry #category-select');
+            const category = catSelect ? catSelect.value : "その他";
 
-        console.log("Starting transition timer...");
+            // Generate
+            const entryId = generateUUID();
+            const dateKey = getTodayDateKey();
 
-        // Verify elements existence
-        if (!document.getElementById('screen-result')) {
-            alert("CRITICAL ERROR: Result screen DOM not found!");
-            return;
+            debugLog(`Generated ID: ${entryId}`);
+
+            state.entryData = { id: entryId, activity, category, dateKey };
+            state.gachaResult = runGacha(entryId, dateKey);
+
+            debugLog("Logic: Gacha OK. Rendering...");
+
+            resetResultUI();
+            renderResult(state.gachaResult);
+
+            debugLog("Render: OK.");
+
+        } catch (err) {
+            debugLog(`ERROR in Logic: ${err.message}`);
+            alert(`Logic Error: ${err.message}`);
+            // Even if logic fails, try to show result screen (maybe empty) to prove transition works?
+            // Or stop? User said "Force result". Let's continue to show screen to see if that works.
         }
 
-        // Delay for effect
-        await new Promise(resolve => setTimeout(resolve, 400));
+        // --- FORCE TRANSITION (The "断定テスト1") ---
+        debugLog("Transition: Forcing Display Switch...");
 
-        console.log("Executing Gacha...");
+        try {
+            // Force Display Styles
+            screenEntry.style.display = 'none';
+            screenEntry.classList.remove('active');
 
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+            screenResult.style.display = 'block';
+            screenResult.classList.add('active');
 
-        // Generate new entry
-        const entryId = generateUUID();
-        const dateKey = getTodayDateKey();
+            // Force Scroll
+            window.scrollTo(0, 0);
+            screenResult.scrollIntoView(); // standard
 
-        state.entryData = { id: entryId, activity, category, dateKey };
-        state.gachaResult = runGacha(entryId, dateKey);
-        state.userChoice = null;
+            state.currentScreen = 'screen-result';
+            debugLog("Transition: Switch Complete. Result should be visible.");
 
-        console.log("Gacha Result:", state.gachaResult);
-
-        // Reset UI
-        resetResultUI();
-        renderResult(state.gachaResult);
-
-        console.log("Showing Result Screen");
-        // alert("DEBUG: Transitioning to Result..."); // Debug
-        showScreen('screen-result');
-
-    } catch (err) {
-        console.error("Error in btn-open-scroll handler:", err);
-        alert("JS ERROR: " + err.message);
-        // Recovery
-        const btn = document.getElementById('btn-open-scroll');
-        if (btn) btn.disabled = false;
-    }
-});
+        } catch (cssErr) {
+            debugLog(`ERROR in CSS Switch: ${cssErr.message}`);
+            alert(`CSS Error: ${cssErr.message}`);
+        }
+    });
+} else {
+    debugLog("CRITICAL: Entry Button Not Found on Init!");
+}
 
 function resetResultUI() {
     document.getElementById('judgment-area').classList.remove('hidden');
