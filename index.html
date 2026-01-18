@@ -22,16 +22,19 @@
         <section id="screen-entry" class="screen active">
             <div class="intro-container">
                 <h1 class="main-title">秘伝・乱入之巻</h1>
+                <div class="seal-mark-input" id="seal-input">現場</div>
+
                 <div class="ninja-icon-large">🥷</div>
-                <p class="intro-text">日常の隙間に、忍は潜む。<br>いま、何をしておる？</p>
+                <!-- Intro Text: Random Mantra -->
+                <p id="intro-mantra" class="intro-text">いまの現場を記せ。忍者はここに乱入する。</p>
 
                 <div class="form-group">
-                    <label for="activity-input">いまの行動（必須）</label>
-                    <input type="text" id="activity-input" placeholder="例：コーヒーを淹れている、会議中..." maxlength="30">
+                    <label for="activity-input">現場（いま何してる？） <span class="sub-label">— 現場記録 —</span></label>
+                    <input type="text" id="activity-input" placeholder="例：会議で議事録..." maxlength="30">
                 </div>
 
                 <div class="form-group">
-                    <label for="category-select">状況（任意）</label>
+                    <label for="category-select">状況（場所/モード） <span class="sub-label">— 環境条件 —</span></label>
                     <select id="category-select">
                         <option value="生活">生活（日常）</option>
                         <option value="仕事">仕事（忍務）</option>
@@ -43,10 +46,10 @@
                     </select>
                 </div>
 
-                <button id="btn-open-scroll" class="btn-primary">巻物を開く</button>
+                <button id="btn-open-scroll" class="btn-primary">乱入を召喚<div class="btn-sub">秘伝書を開帳</div></button>
 
                 <div class="footer-link">
-                    <button id="btn-view-archive-from-entry" class="btn-text">古き巻物を見る（履歴）</button>
+                    <button id="btn-view-archive-from-entry" class="btn-text">巻物庫を開く（履歴）</button>
                 </div>
             </div>
         </section>
@@ -62,6 +65,9 @@
             <!-- 巻物カード -->
             <div class="scroll-card-wrapper">
                 <div class="scroll-card">
+                    <!-- Notification Banner -->
+                    <div id="raid-banner" class="notification-banner">【乱入発生】忍者が現れた！</div>
+
                     <div class="scroll-header">
                         <h2 class="scroll-title">秘伝・乱入之巻</h2>
                         <div id="seal-mark" class="seal-mark">極秘</div>
@@ -69,14 +75,22 @@
 
                     <div class="scroll-body">
                         <!-- 1. 口上 -->
-                        <div class="section-title">口上</div>
+                        <div class="section-header">
+                            <span class="main-label">乱入状況</span>
+                            <span class="sub-label">（口上）</span>
+                            <span id="sfx-scene" class="sfx-tag"></span>
+                        </div>
                         <div class="text-box">
                             <p id="result-scene" class="text-body-bold">ここに乱入シーンが表示されます。</p>
                         </div>
                         <hr class="divider-thin">
 
                         <!-- 2. 術式 -->
-                        <div class="section-title">術式</div>
+                        <div class="section-header">
+                            <span class="main-label">乱入手順</span>
+                            <span class="sub-label">（術式）</span>
+                            <span id="sfx-process" class="sfx-tag"></span>
+                        </div>
                         <div class="text-box">
                             <ol id="result-steps" class="steps-list">
                                 <li>ステップ1</li>
@@ -87,7 +101,11 @@
                         <hr class="divider-thin">
 
                         <!-- 3. 余韻 -->
-                        <div class="section-title">余韻</div>
+                        <div class="section-header">
+                            <span class="main-label">後味</span>
+                            <span class="sub-label">（余韻）</span>
+                            <span id="sfx-ochi" class="sfx-tag"></span>
+                        </div>
                         <div class="text-box">
                             <p id="result-och" class="text-body">ここにオチが表示されます。</p>
                         </div>
@@ -95,11 +113,14 @@
 
                         <!-- 4. 判定 -->
                         <div id="judgment-area">
-                            <div class="section-title">判定</div>
+                            <div class="section-header">
+                                <span class="main-label">忍者が来たら？</span>
+                                <span class="sub-label">（判定）</span>
+                            </div>
                             <div class="buttons-vertical">
-                                <button id="btn-yes" class="btn-judgement btn-yes">面白くなる<span
+                                <button id="btn-yes" class="btn-judgement btn-yes">乱入したら面白くなる<span
                                         class="sub-text">（開帳）</span></button>
-                                <button id="btn-no" class="btn-judgement btn-no">台無し<span
+                                <button id="btn-no" class="btn-judgement btn-no">乱入は邪魔<span
                                         class="sub-text">（封印）</span></button>
                             </div>
 

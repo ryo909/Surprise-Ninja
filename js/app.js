@@ -1,4 +1,4 @@
-import { seals, scenes, processes } from './deck.js';
+import { seals, scenes, processes, raidBanners, fieldMantras, sfxTags, activityPlaceholders, sealsInput, sealsResultExtra } from './deck.js';
 import { Storage } from './storage.js';
 
 // --- State ---
@@ -16,6 +16,24 @@ const screens = {
     result: document.getElementById('screen-result'),
     archive: document.getElementById('screen-archive')
 };
+
+// --- Init (Plan B) ---
+function initEntryScreen() {
+    // 1. Random Mantra
+    const randomMantra = fieldMantras[Math.floor(Math.random() * fieldMantras.length)];
+    document.getElementById('intro-mantra').textContent = randomMantra;
+
+    // 2. Random Placeholder
+    const randomPlaceholder = activityPlaceholders[Math.floor(Math.random() * activityPlaceholders.length)];
+    document.getElementById('activity-input').placeholder = randomPlaceholder;
+
+    // 3. Random Seal
+    const randomSeal = sealsInput[Math.floor(Math.random() * sealsInput.length)];
+    document.getElementById('seal-input').textContent = randomSeal;
+}
+// Run on load
+initEntryScreen();
+
 
 // --- Utils ---
 function generateUUID() {
@@ -58,19 +76,36 @@ function runGacha(entryId, dateKey) {
     const processIndex = (seed * 7 + 13) % processes.length;
     const sealIndex = (seed * 11 + 5) % seals.length;
 
+    // Plan A: Extra Seeded Metadata
+    const bannerIndex = (seed * 3 + 7) % raidBanners.length;
+    // SFX (3 distinct)
+    const sfx1 = sfxTags[(seed * 2 + 1) % sfxTags.length];
+    const sfx2 = sfxTags[(seed * 5 + 3) % sfxTags.length];
+    const sfx3 = sfxTags[(seed * 7 + 11) % sfxTags.length];
+
     return {
         scene: scenes[sceneIndex],
         process: processes[processIndex],
         seal: seals[sealIndex],
-        seed: seed
+        seed: seed,
+        // New Props
+        banner: raidBanners[bannerIndex],
+        sfx: [sfx1, sfx2, sfx3]
     };
 }
 
 function renderResult(result) {
-    document.getElementById('seal-mark').textContent = result.seal;
-    document.getElementById('result-scene').textContent = result.scene.text;
+    // 1. Banner
+    document.getElementById('raid-banner').textContent = result.banner;
 
-    // Steps
+    // 2. Seal
+    document.getElementById('seal-mark').textContent = result.seal;
+
+    // 3. Scene (with prefix)
+    document.getElementById('result-scene').textContent = "【乱入】" + result.scene.text;
+    document.getElementById('sfx-scene').textContent = result.sfx[0]; // SFX 1
+
+    // 4. Steps
     const stepsList = document.getElementById('result-steps');
     stepsList.innerHTML = '';
     result.process.steps.forEach(step => {
@@ -78,18 +113,11 @@ function renderResult(result) {
         li.textContent = step;
         stepsList.appendChild(li);
     });
+    document.getElementById('sfx-process').textContent = result.sfx[1]; // SFX 2
 
-    // Ochi (using step 3 as ochi or static text if needed. 
-    // Prompt said "章「余韻」：オチ1行". Let's assume the last step is the ochi or generate separate?)
-    // In the data structure, steps has 3 items. Let's use the 3rd step as the "Ochi" or similar?
-    // Actually, looking at prompt: "章「術式」：乱入プロセス（3ステップ ①②③）" AND "章「余韻」：オチ1行".
-    // My deck.js currently only has 3 steps in 'steps' array.
-    // Let's use the 3rd step as the "Ochi" for now, or just repeat the last step.
-    // IMPROVEMENT: Let's split the last step to Ochi area for better effect.
-    // Wait, prompt deck example: steps=["...","...","後処理：..."].
-    // I will use a generic message or derive from scene if missing. 
-    // For now, let's just use a fixed funny vibe text or last step.
+    // 5. Ochi (Placeholder logic as consistent with previous step)
     document.getElementById('result-och').textContent = "――此度もまた、記録に残らぬ戦いであった。";
+    document.getElementById('sfx-ochi').textContent = result.sfx[2]; // SFX 3
 }
 
 // --- UI Actions ---
@@ -103,19 +131,30 @@ document.getElementById('btn-open-scroll').addEventListener('click', () => {
     }
     const category = document.getElementById('category-select').value;
 
-    // Generate new entry
-    const entryId = generateUUID();
-    const dateKey = getTodayDateKey();
+    // Slight Delay or "Transition"? User said "0.3s notification effect" (Optional).
+    // Let's implement a simple alert or just quick transition.
+    // Button text change for feedback
+    const btn = document.getElementById('btn-open-scroll');
+    const originalText = btn.innerHTML;
+    btn.textContent = "【侵入検知】現場を特定…";
 
-    state.entryData = { id: entryId, activity, category, dateKey };
-    state.gachaResult = runGacha(entryId, dateKey);
-    state.userChoice = null;
+    setTimeout(() => {
+        btn.innerHTML = originalText;
 
-    // Reset UI
-    resetResultUI();
-    renderResult(state.gachaResult);
+        // Generate new entry
+        const entryId = generateUUID();
+        const dateKey = getTodayDateKey();
 
-    showScreen('screen-result');
+        state.entryData = { id: entryId, activity, category, dateKey };
+        state.gachaResult = runGacha(entryId, dateKey);
+        state.userChoice = null;
+
+        // Reset UI
+        resetResultUI();
+        renderResult(state.gachaResult);
+
+        showScreen('screen-result');
+    }, 400); // 0.4s delay
 });
 
 function resetResultUI() {
@@ -244,7 +283,7 @@ function renderArchive() {
         el.addEventListener('click', () => {
             // Re-render result screen in "ReadOnly" mode
             state.entryData = { id: log.id, activity: log.activity, category: log.category, dateKey: log.dateKey };
-            // Re-run gacha to get texts
+            // Re-run gacha to get texts (and banners/sfx which are deterministic)
             state.gachaResult = runGacha(log.id, log.dateKey);
 
             // Render
@@ -254,12 +293,21 @@ function renderArchive() {
             // Hide interaction, show saved state
             document.getElementById('judgment-area').classList.add('hidden');
             document.getElementById('saved-message').classList.remove('hidden');
+            document.getElementById('raid-banner').classList.add('hidden'); // Archive view might not need "Abnormal" alert or keep it? 
+            // User didn't specify, but "Notification Bar" makes sense for "Fresh" intrusion. 
+            // For archive, maybe keep it or hide? 
+            // "【記録】忍者乱入ログ" is one of the banners. 
+            // Let's show it, it adds flavor. Actually, let's just show it.
+            document.getElementById('raid-banner').classList.remove('hidden'); // Ensure shown
+
             document.getElementById('btn-retry').textContent = "戻る";
             document.getElementById('btn-retry').onclick = () => {
                 showScreen('screen-archive');
                 // restore handler
                 document.getElementById('btn-retry').textContent = "次の乱入を召喚";
                 document.getElementById('btn-retry').onclick = () => {
+                    // Need to re-init entry screen texts?
+                    initEntryScreen();
                     showScreen('screen-entry');
                     document.getElementById('activity-input').value = "";
                 };
