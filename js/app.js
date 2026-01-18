@@ -123,23 +123,50 @@ function renderResult(result) {
 // --- UI Actions ---
 
 // 1. Entry -> Result
-document.getElementById('btn-open-scroll').addEventListener('click', () => {
-    const activity = document.getElementById('activity-input').value.trim();
-    if (!activity) {
-        alert("いま何をしているか、白状するのだ。");
-        return;
-    }
-    const category = document.getElementById('category-select').value;
+document.getElementById('btn-open-scroll').addEventListener('click', async (e) => {
+    e.preventDefault();
+    console.log("Button clicked: btn-open-scroll");
 
-    // Slight Delay or "Transition"? User said "0.3s notification effect" (Optional).
-    // Let's implement a simple alert or just quick transition.
-    // Button text change for feedback
-    const btn = document.getElementById('btn-open-scroll');
-    const originalText = btn.innerHTML;
-    btn.textContent = "【侵入検知】現場を特定…";
+    try {
+        const activityInput = document.getElementById('activity-input');
+        const activity = activityInput.value.trim();
 
-    setTimeout(() => {
+        console.log("Activity value:", activity);
+
+        if (!activity) {
+            console.warn("Validation failed: Empty activity");
+            // UI Error Feedback
+            activityInput.style.borderColor = "#db3b3b";
+            activityInput.style.backgroundColor = "rgba(219, 59, 59, 0.1)";
+            activityInput.focus();
+
+            // Shake effect (simple CSS class toggle)
+            activityInput.classList.add('shake');
+            setTimeout(() => activityInput.classList.remove('shake'), 500);
+            return;
+        } else {
+            // Reset style
+            activityInput.style.borderColor = "#555";
+            activityInput.style.backgroundColor = "#333";
+        }
+
+        const category = document.getElementById('category-select').value;
+
+        // Button text change for feedback
+        const btn = document.getElementById('btn-open-scroll');
+        const originalText = btn.innerHTML;
+        btn.textContent = "【侵入検知】現場を特定…"; // Simple text replace for now
+        btn.disabled = true;
+
+        console.log("Starting transition timer...");
+
+        // Delay for effect
+        await new Promise(resolve => setTimeout(resolve, 400));
+
+        console.log("Executing Gacha...");
+
         btn.innerHTML = originalText;
+        btn.disabled = false;
 
         // Generate new entry
         const entryId = generateUUID();
@@ -149,12 +176,22 @@ document.getElementById('btn-open-scroll').addEventListener('click', () => {
         state.gachaResult = runGacha(entryId, dateKey);
         state.userChoice = null;
 
+        console.log("Gacha Result:", state.gachaResult);
+
         // Reset UI
         resetResultUI();
         renderResult(state.gachaResult);
 
+        console.log("Showing Result Screen");
         showScreen('screen-result');
-    }, 400); // 0.4s delay
+
+    } catch (err) {
+        console.error("Error in btn-open-scroll handler:", err);
+        alert("エラーが発生しました: " + err.message);
+        // Recovery
+        const btn = document.getElementById('btn-open-scroll');
+        if (btn) btn.disabled = false;
+    }
 });
 
 function resetResultUI() {
