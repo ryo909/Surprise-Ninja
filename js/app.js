@@ -1,4 +1,4 @@
-import { seals, scenes, processes, raidBanners, fieldMantras, sfxTags, activityPlaceholders, sealsInput, sealsResultExtra } from './deck.js';
+import { seals, scenes, processes, raidBanners, fieldMantras, sfxTags, activityPlaceholders, sealsInput } from './deck.js';
 import { Storage } from './storage.js';
 
 
