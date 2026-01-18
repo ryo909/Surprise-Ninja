@@ -28,18 +28,21 @@
             <!-- Hero Banner (Top Main Visual) -->
             <div class="heroBanner" aria-label="Ninja main visual">
                 <div class="heroBanner__overlay"></div>
-                <div class="heroBanner__tag" aria-hidden="true">乱入</div>
+                <!-- タイトルを中央下に配置 -->
                 <div class="heroBanner__titleWrap">
                     <div class="heroBanner__title">秘伝・乱入之巻</div>
                 </div>
             </div>
 
             <div class="intro-container">
-                <!-- 3ステップ札 -->
-                <div class="step-cards">
-                    <div class="step-card"><span class="step-num">①</span> 現場を記す</div>
-                    <div class="step-card"><span class="step-num">②</span> 状況を選ぶ</div>
-                    <div class="step-card"><span class="step-num">③</span> 忍者を乱入させる</div>
+                <!-- 使い方（3手）見出し + タグ -->
+                <div class="howto-wrap">
+                    <div class="howto-label">使い方（3手）</div>
+                    <div class="howto-tags">
+                        <div class="howto-tag"><span class="howto-num">①</span> 現場を記す</div>
+                        <div class="howto-tag"><span class="howto-num">②</span> 状況を選ぶ</div>
+                        <div class="howto-tag"><span class="howto-num">③</span> 忍者を乱入させる</div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -219,7 +222,7 @@
     <script type="module">
         const push = window.__forcePush || ((m) => console.log(m));
         push("APP IMPORT START");
-        import('./js/app.js?v=20260118_force6')
+        import('./js/app.js?v=20260118_force7')
             .then(() => push("APP IMPORT OK"))
             .catch((err) => {
                 push("APP IMPORT FAIL: " + (err?.message || err));

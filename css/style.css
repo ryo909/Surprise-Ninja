@@ -175,21 +175,85 @@ body {
     user-select: none;
 }
 
-/* タイトルをバナー内に置く */
+/* タイトルをバナー中央下に配置 */
 .heroBanner__titleWrap {
     position: absolute;
-    right: 14px;
-    bottom: 12px;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
     z-index: 2;
+    text-align: center;
 }
 
 .heroBanner__title {
     font-family: var(--font-brush);
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
-    color: rgba(255, 255, 255, 0.92);
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65);
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.96);
+    white-space: nowrap;
+    /* 重みを増す：影 + ストローク */
+    text-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.65),
+        0 0 2px rgba(0, 0, 0, 0.75);
+    -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.45);
+}
+
+/* ===== 使い方（3手）見出し + 金属タグ ===== */
+.howto-wrap {
+    margin-bottom: 24px;
+}
+
+.howto-label {
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 10px;
+}
+
+.howto-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* 薄い金属タグ */
+.howto-tag {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    box-shadow: none;
+    color: rgba(255, 255, 255, 0.88);
+    padding: 8px 14px;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    cursor: default;
+    pointer-events: none;
+    user-select: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 金属のハイライト（控えめ） */
+.howto-tag::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.12),
+            rgba(255, 255, 255, 0.02));
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.howto-num {
+    font-size: 11px;
+    opacity: 0.7;
 }
 
 .main-title {
