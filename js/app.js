@@ -12,8 +12,10 @@ import {
     fieldMantras,
     sfxTags,
     activityPlaceholders,
-    sealsInput
-} from './deck.js?v=force3';
+    sealsInput,
+    koushiou,
+    afterglows
+} from './deck.js?v=force4';
 import { Storage } from './storage.js';
 
 // [RULE] Import Safety:
@@ -111,6 +113,10 @@ function runGacha(entryId, dateKey, category) {
     const sfx2 = sfxTags[(seed * 5 + 3) % sfxTags.length];
     const sfx3 = sfxTags[(seed * 7 + 11) % sfxTags.length];
 
+    // 口上（乱入の現れ方）と余韻（後味）
+    const koushiouIndex = (seed * 13 + 17) % koushiou.length;
+    const afterglowIndex = (seed * 19 + 23) % afterglows.length;
+
     return {
         scene: scenes[sceneIndex],
         process: pool[processIndex], // Use selected pool
@@ -118,7 +124,9 @@ function runGacha(entryId, dateKey, category) {
         seed: seed,
         // New Props
         banner: raidBanners[bannerIndex],
-        sfx: [sfx1, sfx2, sfx3]
+        sfx: [sfx1, sfx2, sfx3],
+        koushiou: koushiou[koushiouIndex],
+        afterglow: afterglows[afterglowIndex]
     };
 }
 
@@ -143,16 +151,20 @@ function renderResult(result, activity) {
     // 2. Seal
     document.getElementById('seal-mark').textContent = result.seal;
 
-    // 3. Scene (with prefix)
-    document.getElementById('result-scene').textContent = "【乱入】" + result.scene.text;
+    // 3. 口上（乱入の現れ方）+ Scene
+    const koushiouText = result.koushiou || "";
+    const sceneText = result.scene?.text || "";
+    document.getElementById('result-scene').textContent = koushiouText + " " + sceneText;
     document.getElementById('sfx-scene').textContent = result.sfx[0]; // SFX 1
 
     // 4. Steps
     renderProcessSteps(result.process.steps, activity);
     document.getElementById('sfx-process').textContent = result.sfx[1]; // SFX 2
 
-    // 5. Ochi (Placeholder logic as consistent with previous step)
-    document.getElementById('result-och').textContent = "――此度もまた、記録に残らぬ戦いであった。";
+    // 5. 余韻（後味）with template replacement
+    const vars = { task: activity };
+    const afterglowText = applyTemplate(result.afterglow || "", vars);
+    document.getElementById('result-och').textContent = afterglowText;
     document.getElementById('sfx-ochi').textContent = result.sfx[2]; // SFX 3
 }
 
