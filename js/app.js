@@ -13,7 +13,7 @@ import {
     sfxTags,
     activityPlaceholders,
     sealsInput
-} from './deck.js';
+} from './deck.js?v=force3';
 import { Storage } from './storage.js';
 
 // [RULE] Import Safety:
@@ -158,26 +158,7 @@ function renderResult(result, activity) {
 
 // ... (Debug Utils & Events) ...
 
-// 1. Entry -> Result (Delegated Event - The "断定テスト3")
-document.body.addEventListener('click', async (e) => {
-    // ... (Validation and Element Checks) ...
-    // Note: Assuming previous robust checks are preserved implicitly or replaced here. 
-    // Since this is a REPLACEMENT, I must include the surrounding code carefully or replace just the logic.
-    // The previous tool use implies I need to be careful with context. 
-    // I will use StartLine/EndLine relative to the file content viewed previously.
-    // Wait, the ReplacementContent above is missing the event listener implementation details!
-    // I should probably target specific functions to be safe, rather than a huge block.
-    // Splitting this into smaller replacements is safer.
 
-    // RE-PLANNING: I will split this replacement.
-    // 1. Update Imports
-    // 2. Add Helper Functions
-    // 3. Update runGacha signature and logic
-    // 4. Update renderResult logic
-
-    // This tool call is canceled. I will issue separate calls.
-    return;
-}
 
 // [RULE] Import Safety:
 // 1. Ensure all imported names exist in 'deck.js' (export const).
@@ -185,57 +166,57 @@ document.body.addEventListener('click', async (e) => {
 
 // ===== FORCE DEBUG v2 (always visible) =====
 (() => {
-        const overlay = document.createElement("div");
-        overlay.id = "__force_debug_overlay__";
-        overlay.style.cssText = [
-            "position:fixed",
-            "top:6px",
-            "left:6px",
-            "z-index:2147483647",
-            "background:rgba(0,0,0,.88)",
-            "color:#ffe66d",
-            "padding:10px 12px",
-            "font:12px/1.35 monospace",
-            "border:1px solid rgba(255,230,109,.5)",
-            "border-radius:10px",
-            "white-space:pre",
-            "pointer-events:none",
-            "max-width:60vw",
-            "max-height:40vh",
-            "overflow:hidden"
-        ].join(";");
+    const overlay = document.createElement("div");
+    overlay.id = "__force_debug_overlay__";
+    overlay.style.cssText = [
+        "position:fixed",
+        "top:6px",
+        "left:6px",
+        "z-index:2147483647",
+        "background:rgba(0,0,0,.88)",
+        "color:#ffe66d",
+        "padding:10px 12px",
+        "font:12px/1.35 monospace",
+        "border:1px solid rgba(255,230,109,.5)",
+        "border-radius:10px",
+        "white-space:pre",
+        "pointer-events:none",
+        "max-width:60vw",
+        "max-height:40vh",
+        "overflow:hidden"
+    ].join(";");
 
-        const push = (msg) => {
-            overlay.textContent = msg + "\n" + overlay.textContent;
-            console.log("[FORCE]", msg);
-        };
+    const push = (msg) => {
+        overlay.textContent = msg + "\n" + overlay.textContent;
+        console.log("[FORCE]", msg);
+    };
 
-        const append = () => {
-            if (!document.getElementById("__force_debug_overlay__")) {
-                document.body.appendChild(overlay);
-            }
-        };
+    const append = () => {
+        if (!document.getElementById("__force_debug_overlay__")) {
+            document.body.appendChild(overlay);
+        }
+    };
 
-        if (document.body) append();
-        document.addEventListener("DOMContentLoaded", append);
+    if (document.body) append();
+    document.addEventListener("DOMContentLoaded", append);
 
-        push("FORCE DEBUG v2 LOADED");
+    push("FORCE DEBUG v2 LOADED");
 
-        document.addEventListener("click", (e) => {
-            const t = e.target;
-            push("CLICK: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
-        }, true);
+    document.addEventListener("click", (e) => {
+        const t = e.target;
+        push("CLICK: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
+    }, true);
 
-        document.addEventListener("pointerdown", (e) => {
-            const t = e.target;
-            push("POINTERDOWN: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
-        }, true);
+    document.addEventListener("pointerdown", (e) => {
+        const t = e.target;
+        push("POINTERDOWN: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
+    }, true);
 
-        window.addEventListener("error", (e) => push("ERROR: " + (e.message || e.type)));
-        window.addEventListener("unhandledrejection", (e) =>
-            push("REJECT: " + (e.reason?.message || e.reason))
-        );
-    })();
+    window.addEventListener("error", (e) => push("ERROR: " + (e.message || e.type)));
+    window.addEventListener("unhandledrejection", (e) =>
+        push("REJECT: " + (e.reason?.message || e.reason))
+    );
+})();
 
 // --- State ---
 const state = {
