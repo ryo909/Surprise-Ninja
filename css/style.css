@@ -1,0 +1,424 @@
+/* Base Reset & Variables */
+:root {
+    --bg-color: #1a1518; /* 濃紫黒 */
+    --scroll-bg: #e8dcc5; /* 羊皮紙ベージュ */
+    --scroll-bg-dark: #d6caa8;
+    --ink-color: #2b2018; /* 墨色 */
+    --accent-red: #8a3b45; /* 朱印の赤紫 */
+    --accent-glow: #bd5e6b;
+    --text-color-light: #f0f0f0;
+    --wood-color: #5d4037;
+    
+    --font-mincho: 'Shippori Mincho', serif;
+    --font-brush: 'Yuji Syuku', serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-mincho);
+    background-color: var(--bg-color);
+    color: var(--text-color-light);
+    -webkit-font-smoothing: antialiased;
+}
+
+#app {
+    width: 100%;
+    max-width: 480px; /* スマホサイズ制限 */
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Screen Visibility Control */
+.screen {
+    display: none;
+    padding-bottom: 40px;
+    animation: fadeIn 0.4s ease;
+}
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Common UI Elements */
+.btn-primary {
+    background: linear-gradient(135deg, #a64b55, #7a2b35);
+    color: #fff;
+    border: none;
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    font-family: var(--font-brush);
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    width: 100%;
+    margin-top: 20px;
+    transition: transform 0.1s;
+}
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid #888;
+    color: var(--ink-color);
+    padding: 12px 24px;
+    font-family: var(--font-brush);
+    width: 100%;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: #888;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-text-small {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.hidden { display: none !important; }
+
+/* Screen 1: Entry */
+#screen-entry {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.main-title {
+    font-family: var(--font-brush);
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(138, 59, 69, 0.5);
+}
+
+.ninja-icon-large {
+    font-size: 4rem;
+    margin: 20px 0;
+}
+
+.intro-text {
+    line-height: 1.6;
+    margin-bottom: 40px;
+    opacity: 0.8;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    border-radius: 4px;
+}
+
+/* Screen 2: Result */
+.visual-area {
+    width: 100%;
+    height: 300px;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+}
+
+.ninja-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+.visual-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--bg-color));
+}
+
+/* Scroll Card Styles */
+.scroll-card-wrapper {
+    position: relative;
+    margin: -40px 10px 20px 10px; /* Visualに重ねる */
+    padding: 0 20px;
+    z-index: 10;
+}
+
+.scroll-card {
+    background: radial-gradient(circle at center, var(--scroll-bg), var(--scroll-bg-dark));
+    color: var(--ink-color);
+    padding: 30px 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    position: relative;
+    /* 古びた紙の表現 */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+}
+
+.scroll-axis {
+    position: absolute;
+    top: -10px;
+    bottom: -10px;
+    width: 16px;
+    background: var(--wood-color);
+    border-radius: 8px;
+    box-shadow: inset 2px 0 5px rgba(0,0,0,0.3);
+}
+
+.axis-left { left: 0; }
+.axis-right { right: 0; }
+
+.scroll-header {
+    position: relative;
+    text-align: center;
+    border-bottom: 2px solid rgba(43, 32, 24, 0.1);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.scroll-title {
+    font-family: var(--font-brush);
+    font-size: 1.8rem;
+    margin: 0;
+    transform: rotate(-1deg);
+}
+
+.seal-mark {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    border: 3px solid var(--accent-red);
+    color: var(--accent-red);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-brush);
+    font-weight: bold;
+    font-size: 1.2rem;
+    transform: rotate(-10deg);
+    opacity: 0.85;
+    background: rgba(138, 59, 69, 0.05);
+    box-shadow: 0 0 5px rgba(138, 59, 69, 0.2);
+    /* かすれ表現用マスク等はCSS簡易版では省略 */
+}
+
+.section-title {
+    font-family: var(--font-brush);
+    font-size: 1.3rem;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(43, 32, 24, 0.2);
+    padding-bottom: 2px;
+}
+
+.text-body-bold {
+    font-weight: bold;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.text-body {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.steps-list {
+    padding-left: 20px;
+    line-height: 1.6;
+}
+.steps-list li { margin-bottom: 6px; }
+
+.divider-thin {
+    border: 0;
+    border-top: 1px dashed rgba(43, 32, 24, 0.3);
+    margin: 20px 0;
+}
+
+/* Judgement UI */
+.buttons-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.btn-judgement {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid var(--ink-color);
+    background: transparent;
+    color: var(--ink-color);
+    font-family: var(--font-brush);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-yes:hover, .btn-yes.selected {
+    background: var(--ink-color);
+    color: #fff;
+    border-color: var(--ink-color);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.btn-no:hover, .btn-no.selected {
+    background: #555;
+    color: #fff;
+    border-color: #555;
+}
+
+.sub-text {
+    font-size: 0.8rem;
+    font-family: var(--font-mincho);
+    margin-left: 8px;
+}
+
+/* Slider Area */
+#slider-area {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+    animation: fadeIn 0.3s;
+}
+
+.slider-label-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+input[type=range] {
+    width: 100%;
+    margin: 10px 0 20px 0;
+    accent-color: var(--ink-color);
+}
+
+textarea {
+    width: 100%;
+    padding: 8px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-family: var(--font-mincho);
+    margin-bottom: 10px;
+}
+
+#saved-message {
+    text-align: center;
+    margin: 20px 0;
+    font-weight: bold;
+    color: var(--accent-red);
+}
+
+.result-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    padding-bottom: 20px;
+}
+
+/* Screenshot Mode adjustments */
+.shakyo-mode .visual-area { height: 400px; }
+.shakyo-mode .result-footer, 
+.shakyo-mode .buttons-vertical,
+.shakyo-mode #slider-area,
+.shakyo-mode #btn-toggle-shakyo {
+    display: none !important;
+}
+.shakyo-mode .shakyo-footer { display: block; text-align: right; opacity: 0.6; font-size: 0.8rem; margin-top: 20px;}
+.shakyo-mode .scroll-card-wrapper { margin-top: -60px; }
+
+#btn-toggle-shakyo {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    z-index: 100;
+}
+
+/* Archive Screen */
+#screen-archive {
+    padding: 20px;
+}
+
+.archive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #555;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.archive-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.log-item {
+    background: var(--scroll-bg);
+    color: var(--ink-color);
+    padding: 12px;
+    border-radius: 4px;
+    border-left: 4px solid var(--accent-red);
+    cursor: pointer;
+    font-family: var(--font-mincho);
+}
+.log-item.sealed { border-left-color: #555; filter: grayscale(0.5); }
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+.log-body {
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
