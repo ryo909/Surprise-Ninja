@@ -29,17 +29,26 @@
                 <h1 class="main-title">秘伝・乱入之巻</h1>
                 <div class="seal-mark-input" id="seal-input">現場</div>
 
-                <div class="ninja-icon-large">🥷</div>
-                <!-- Intro Text: Random Mantra -->
-                <p id="intro-mantra" class="intro-text">いまの現場を記せ。忍者はここに乱入する。</p>
+                <!-- 朱印（角印）：忍者アイコンの代替 -->
+                <div class="shuin-stamp">
+                    <span class="shuin-text">乱入</span>
+                </div>
 
-                <div class="form-group">
-                    <label for="activity-input">現場（いま何してる？） <span class="sub-label">— 現場記録 —</span></label>
-                    <input type="text" id="activity-input" placeholder="例：会議で議事録..." maxlength="30">
+                <!-- 3ステップ札 -->
+                <div class="step-cards">
+                    <div class="step-card"><span class="step-num">①</span> 現場を記す</div>
+                    <div class="step-card"><span class="step-num">②</span> 状況を選ぶ</div>
+                    <div class="step-card"><span class="step-num">③</span> 忍者を乱入させる</div>
                 </div>
 
                 <div class="form-group">
-                    <label for="category-select">状況（場所/モード） <span class="sub-label">— 環境条件 —</span></label>
+                    <label for="activity-input">現場（いま何してる？）</label>
+                    <input type="text" id="activity-input" placeholder="会議の議事録 / 返信待ち / SNS巡回 / 家事ループ / 移動の虚無"
+                        maxlength="30">
+                </div>
+
+                <div class="form-group">
+                    <label for="category-select">状況（場所/モード）</label>
                     <select id="category-select">
                         <option value="生活">生活（日常）</option>
                         <option value="仕事">仕事（忍務）</option>
@@ -51,8 +60,7 @@
                     </select>
                 </div>
 
-                <button id="btn-open-scroll" class="btn-primary" type="button">乱入を召喚<div class="btn-sub">秘伝書を開帳</div>
-                </button>
+                <button id="btn-open-scroll" class="btn-primary" type="button">忍者を乱入させる</button>
 
                 <div class="footer-link">
                     <button id="btn-view-archive-from-entry" class="btn-text">巻物庫を開く（履歴）</button>
@@ -210,7 +218,7 @@
     <script type="module">
         const push = window.__forcePush || ((m) => console.log(m));
         push("APP IMPORT START");
-        import('./js/app.js?v=20260118_force4')
+        import('./js/app.js?v=20260118_force5')
             .then(() => push("APP IMPORT OK"))
             .catch((err) => {
                 push("APP IMPORT FAIL: " + (err?.message || err));

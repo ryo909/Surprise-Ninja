@@ -254,17 +254,9 @@ const screens = {
     archive: document.getElementById('screen-archive')
 };
 
-// --- Init (Plan B) ---
+// --- Init (Entry Screen) ---
 function initEntryScreen() {
-    // 1. Random Mantra
-    const randomMantra = fieldMantras[Math.floor(Math.random() * fieldMantras.length)];
-    document.getElementById('intro-mantra').textContent = randomMantra;
-
-    // 2. Random Placeholder
-    const randomPlaceholder = activityPlaceholders[Math.floor(Math.random() * activityPlaceholders.length)];
-    document.getElementById('activity-input').placeholder = randomPlaceholder;
-
-    // 3. Random Seal
+    // Random Seal for shuin stamp
     const randomSeal = sealsInput[Math.floor(Math.random() * sealsInput.length)];
     document.getElementById('seal-input').textContent = randomSeal;
 }
@@ -486,38 +478,69 @@ function renderArchive() {
         return;
     }
 
+    // Helper: Generate rating bar (■■■□□)
+    function getRatingBar(value) {
+        if (value === undefined || value === null) return '—';
+        const v = Math.max(1, Math.min(5, Number(value) || 0));
+        const filled = '■'.repeat(v);
+        const empty = '□'.repeat(5 - v);
+        return filled + empty;
+    }
+
     logs.forEach(log => {
-        // Find Scene Text (fallback if id changed, though simple look up for now)
-        const scene = scenes.find(s => s.id === log.sceneId) || { text: "（消滅した記録）" };
+        const hasRating = log.rating && (log.rating.hype || log.rating.ruin);
+        const isSealed = hasRating;
 
         const el = document.createElement('div');
         el.className = `log-item ${log.choice === 'NO' ? 'sealed' : ''}`;
-        el.innerHTML = `
+
+        // Build card HTML
+        let html = `
+            <div class="log-seal ${isSealed ? 'sealed' : 'unsealed'}">${isSealed ? '封印' : '未封印'}</div>
+            <div class="log-activity">${log.activity || '（記録なし）'}</div>
             <div class="log-header">
                 <span>${log.dateKey}</span>
-                <span>${log.sealText}</span>
+                <span>${log.sealText || ''}</span>
             </div>
-            <div class="log-body">${scene.text}</div>
         `;
+
+        // Add ratings if present
+        if (hasRating) {
+            html += `
+                <div class="log-ratings">
+                    <div class="log-rating-row">
+                        <span class="log-rating-label">盛り上がり:</span>
+                        <span class="log-rating-bar">${getRatingBar(log.rating.hype)}</span>
+                    </div>
+                    <div class="log-rating-row">
+                        <span class="log-rating-label">台無し:</span>
+                        <span class="log-rating-bar">${getRatingBar(log.rating.ruin)}</span>
+                    </div>
+                </div>
+            `;
+            if (log.rating.memo) {
+                html += `<div class="log-memo">メモ：${log.rating.memo}</div>`;
+            }
+        } else {
+            html += `<div class="log-empty-rating">評価未入力</div>`;
+        }
+
+        el.innerHTML = html;
+
         el.addEventListener('click', () => {
             // Re-render result screen in "ReadOnly" mode
             state.entryData = { id: log.id, activity: log.activity, category: log.category, dateKey: log.dateKey };
             // Re-run gacha to get texts (and banners/sfx which are deterministic)
-            state.gachaResult = runGacha(log.id, log.dateKey);
+            state.gachaResult = runGacha(log.id, log.dateKey, log.category);
 
             // Render
             resetResultUI();
-            renderResult(state.gachaResult);
+            renderResult(state.gachaResult, log.activity);
 
             // Hide interaction, show saved state
             document.getElementById('judgment-area').classList.add('hidden');
             document.getElementById('saved-message').classList.remove('hidden');
-            document.getElementById('raid-banner').classList.add('hidden'); // Archive view might not need "Abnormal" alert or keep it? 
-            // User didn't specify, but "Notification Bar" makes sense for "Fresh" intrusion. 
-            // For archive, maybe keep it or hide? 
-            // "【記録】忍者乱入ログ" is one of the banners. 
-            // Let's show it, it adds flavor. Actually, let's just show it.
-            document.getElementById('raid-banner').classList.remove('hidden'); // Ensure shown
+            document.getElementById('raid-banner').classList.remove('hidden');
 
             document.getElementById('btn-retry').textContent = "戻る";
             document.getElementById('btn-retry').onclick = () => {
@@ -525,8 +548,6 @@ function renderArchive() {
                 // restore handler
                 document.getElementById('btn-retry').textContent = "次の乱入を召喚";
                 document.getElementById('btn-retry').onclick = () => {
-                    // Need to re-init entry screen texts?
-                    initEntryScreen();
                     showScreen('screen-entry');
                     document.getElementById('activity-input').value = "";
                 };
