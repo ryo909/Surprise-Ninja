@@ -1,6 +1,61 @@
 import { seals, scenes, processes, raidBanners, fieldMantras, sfxTags, activityPlaceholders, sealsInput, sealsResultExtra } from './deck.js';
 import { Storage } from './storage.js';
 
+
+// ===== FORCE DEBUG v2 (always visible) =====
+(() => {
+    const overlay = document.createElement("div");
+    overlay.id = "__force_debug_overlay__";
+    overlay.style.cssText = [
+        "position:fixed",
+        "top:6px",
+        "left:6px",
+        "z-index:2147483647",
+        "background:rgba(0,0,0,.88)",
+        "color:#ffe66d",
+        "padding:10px 12px",
+        "font:12px/1.35 monospace",
+        "border:1px solid rgba(255,230,109,.5)",
+        "border-radius:10px",
+        "white-space:pre",
+        "pointer-events:none",
+        "max-width:60vw",
+        "max-height:40vh",
+        "overflow:hidden"
+    ].join(";");
+
+    const push = (msg) => {
+        overlay.textContent = msg + "\n" + overlay.textContent;
+        console.log("[FORCE]", msg);
+    };
+
+    const append = () => {
+        if (!document.getElementById("__force_debug_overlay__")) {
+            document.body.appendChild(overlay);
+        }
+    };
+
+    if (document.body) append();
+    document.addEventListener("DOMContentLoaded", append);
+
+    push("FORCE DEBUG v2 LOADED");
+
+    document.addEventListener("click", (e) => {
+        const t = e.target;
+        push("CLICK: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
+    }, true);
+
+    document.addEventListener("pointerdown", (e) => {
+        const t = e.target;
+        push("POINTERDOWN: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
+    }, true);
+
+    window.addEventListener("error", (e) => push("ERROR: " + (e.message || e.type)));
+    window.addEventListener("unhandledrejection", (e) =>
+        push("REJECT: " + (e.reason?.message || e.reason))
+    );
+})();
+
 // --- State ---
 const state = {
     currentScreen: 'screen-entry',
