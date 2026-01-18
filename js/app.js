@@ -60,24 +60,25 @@ function hashStringToInt(str) {
 
 // --- Navigation ---
 function showScreen(screenId) {
-    // Debug
-    console.log(`Switching to screen: ${screenId}`);
+    debugLog(`showScreen('${screenId}') CALLED`);
 
-    // Strict display switching
     Object.values(screens).forEach(el => {
-        el.classList.remove('active');
-        el.style.display = 'none'; // Force hide
+        if (el) {
+            el.classList.remove('active');
+            el.style.display = 'none';
+        }
     });
 
     const target = screens[screenId.replace('screen-', '')];
     if (target) {
         target.classList.add('active');
-        target.style.display = 'block'; // Force show
+        target.style.display = 'block';
+        debugLog(`SHOW: #${target.id} (display:block)`);
 
-        // Scroll to top
         window.scrollTo(0, 0);
         target.scrollIntoView({ behavior: 'auto', block: 'start' });
     } else {
+        debugLog(`ERROR: Target not found for ${screenId}`);
         alert(`Error: Screen element not found for ${screenId}`);
     }
 
@@ -138,9 +139,6 @@ function renderResult(result) {
     document.getElementById('sfx-ochi').textContent = result.sfx[2]; // SFX 3
 }
 
-// --- UI Actions ---
-
-// 1. Entry -> Result
 // --- Debug Utils ---
 function debugLog(msg) {
     const el = document.getElementById('debug-console');
@@ -154,107 +152,79 @@ function debugLog(msg) {
 // Log Load
 window.addEventListener('DOMContentLoaded', () => {
     debugLog(`Loaded: v=${new Date().toISOString()}`);
-
-    const btn = document.querySelector('#screen-entry #btn-open-scroll');
-    const resultScreen = document.getElementById('screen-result');
-    debugLog(`Check Elements: Btn=${btn ? 'FOUND' : 'MISSING'}, Result=${resultScreen ? 'FOUND' : 'MISSING'}`);
 });
 
+// GLOBAL CLICK CAPTURE (The "断定テスト2")
+document.addEventListener('click', (e) => {
+    debugLog(`DOC_CLICK: ${e.target.tagName} #${e.target.id} .${e.target.className}`);
+}, true); // Capture phase
 
-// 1. Entry -> Result
-// Scoped Selector to ensure unique button
-const entryBtn = document.querySelector('#screen-entry #btn-open-scroll');
 
-if (entryBtn) {
-    entryBtn.addEventListener('click', async (e) => {
-        e.preventDefault(); // Stop form submit
-        e.stopPropagation(); // Stop bubbling
+// 1. Entry -> Result (Delegated Event - The "断定テスト3")
+document.body.addEventListener('click', async (e) => {
+    // Find closest button if clicked inside
+    const btn = e.target.closest('#btn-open-scroll');
+    if (!btn) return; // Not our button
 
-        debugLog("Event: Clicked 'btn-open-scroll'");
+    e.preventDefault();
+    debugLog("DELEGATE: Clicked #btn-open-scroll");
 
-        // --- 1. Force Screen Switch Test (Priority) ---
-        // Get Elements again to be sure
-        const screenEntry = document.getElementById('screen-entry');
-        const screenResult = document.getElementById('screen-result');
+    // Scope Check
+    const screenEntry = document.getElementById('screen-entry');
+    if (!screenEntry || getComputedStyle(screenEntry).display === 'none') {
+        debugLog("WARN: Clicked button but screen-entry is hidden or missing.");
+    }
 
-        if (!screenEntry || !screenResult) {
-            debugLog("CRITICAL: Screen elements missing!");
-            alert("Error: Screen elements missing");
-            return;
+    // --- Validation ---
+    const activityInput = document.getElementById('activity-input');
+    const activity = activityInput ? activityInput.value.trim() : "";
+    debugLog(`Activity: '${activity}'`);
+
+    if (!activity) {
+        debugLog("Validation: Empty. Shaking.");
+        if (activityInput) {
+            activityInput.classList.add('shake');
+            setTimeout(() => activityInput.classList.remove('shake'), 500);
+            activityInput.focus();
         }
+        return;
+    }
 
-        // --- Validation ---
-        const activityInput = document.querySelector('#screen-entry #activity-input');
-        const activity = activityInput ? activityInput.value.trim() : "";
-        debugLog(`Activity Input: '${activity}'`);
+    const category = document.getElementById('category-select').value;
 
-        if (!activity) {
-            debugLog("Validation: Empty activity. Shaking.");
-            if (activityInput) {
-                activityInput.classList.add('shake');
-                setTimeout(() => activityInput.classList.remove('shake'), 500);
-                activityInput.focus();
-            }
-            return; // Stop if empty
-        }
+    // UI Feedback
+    const originalText = btn.innerHTML;
+    btn.textContent = "【侵入検知】現場を特定…";
+    btn.disabled = true;
 
-        // --- EXECUTION ---
-        try {
-            debugLog("Action: Starting Gacha Logic...");
+    // Wait
+    await new Promise(r => setTimeout(r, 300));
 
-            // Get Category
-            const catSelect = document.querySelector('#screen-entry #category-select');
-            const category = catSelect ? catSelect.value : "その他";
+    try {
+        debugLog("Logic: Running Gacha...");
+        const entryId = generateUUID();
+        const dateKey = getTodayDateKey();
 
-            // Generate
-            const entryId = generateUUID();
-            const dateKey = getTodayDateKey();
+        state.entryData = { id: entryId, activity, category, dateKey };
+        state.gachaResult = runGacha(entryId, dateKey);
 
-            debugLog(`Generated ID: ${entryId}`);
+        debugLog("Logic: Render...");
+        resetResultUI();
+        renderResult(state.gachaResult);
 
-            state.entryData = { id: entryId, activity, category, dateKey };
-            state.gachaResult = runGacha(entryId, dateKey);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
 
-            debugLog("Logic: Gacha OK. Rendering...");
+        debugLog("Transition: Calling showScreen('screen-result')");
+        showScreen('screen-result');
 
-            resetResultUI();
-            renderResult(state.gachaResult);
-
-            debugLog("Render: OK.");
-
-        } catch (err) {
-            debugLog(`ERROR in Logic: ${err.message}`);
-            alert(`Logic Error: ${err.message}`);
-            // Even if logic fails, try to show result screen (maybe empty) to prove transition works?
-            // Or stop? User said "Force result". Let's continue to show screen to see if that works.
-        }
-
-        // --- FORCE TRANSITION (The "断定テスト1") ---
-        debugLog("Transition: Forcing Display Switch...");
-
-        try {
-            // Force Display Styles
-            screenEntry.style.display = 'none';
-            screenEntry.classList.remove('active');
-
-            screenResult.style.display = 'block';
-            screenResult.classList.add('active');
-
-            // Force Scroll
-            window.scrollTo(0, 0);
-            screenResult.scrollIntoView(); // standard
-
-            state.currentScreen = 'screen-result';
-            debugLog("Transition: Switch Complete. Result should be visible.");
-
-        } catch (cssErr) {
-            debugLog(`ERROR in CSS Switch: ${cssErr.message}`);
-            alert(`CSS Error: ${cssErr.message}`);
-        }
-    });
-} else {
-    debugLog("CRITICAL: Entry Button Not Found on Init!");
-}
+    } catch (err) {
+        debugLog(`ERROR: ${err.message}`);
+        alert("Fatal Error: " + err.message);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+});
 
 function resetResultUI() {
     document.getElementById('judgment-area').classList.remove('hidden');
