@@ -84,6 +84,11 @@ function getProcessPoolByMode(mode) {
         case "不明":
             return processesOther?.length ? processesOther : processes;
 
+        case "生活":
+        case "日常":
+            // 生活/日常 uses processesOther or general processes
+            return processesOther?.length ? processesOther : processes;
+
         default:
             return processes;
     }
@@ -117,11 +122,15 @@ function runGacha(entryId, dateKey, category) {
     const koushiouIndex = (seed * 13 + 17) % koushiou.length;
     const afterglowIndex = (seed * 19 + 23) % afterglows.length;
 
+    // Debug output
+    console.log(`[GACHA] SEED=${seed} ENTRY_ID=${entryId.substring(0, 8)} PROCESS_ID=${pool[processIndex]?.id} KOUSHIOU_IDX=${koushiouIndex} AFTERGLOW_IDX=${afterglowIndex}`);
+
     return {
         scene: scenes[sceneIndex],
         process: pool[processIndex], // Use selected pool
         seal: seals[sealIndex],
         seed: seed,
+        entryId: entryId,
         // New Props
         banner: raidBanners[bannerIndex],
         sfx: [sfx1, sfx2, sfx3],
@@ -151,10 +160,9 @@ function renderResult(result, activity) {
     // 2. Seal
     document.getElementById('seal-mark').textContent = result.seal;
 
-    // 3. 口上（乱入の現れ方）+ Scene
+    // 3. 口上（乱入の現れ方）のみ表示（sceneは別項目で出すか省略）
     const koushiouText = result.koushiou || "";
-    const sceneText = result.scene?.text || "";
-    document.getElementById('result-scene').textContent = koushiouText + " " + sceneText;
+    document.getElementById('result-scene').textContent = koushiouText;
     document.getElementById('sfx-scene').textContent = result.sfx[0]; // SFX 1
 
     // 4. Steps
