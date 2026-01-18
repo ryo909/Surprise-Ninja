@@ -1,5 +1,183 @@
-import { seals, scenes, processes, raidBanners, fieldMantras, sfxTags, activityPlaceholders, sealsInput } from './deck.js';
+import {
+    seals,
+    scenes,
+    processes,
+    processesWork,
+    processesStudy,
+    processesCreate,
+    processesRest,
+    processesMove,
+    processesOther,
+    raidBanners,
+    fieldMantras,
+    sfxTags,
+    activityPlaceholders,
+    sealsInput
+} from './deck.js';
 import { Storage } from './storage.js';
+
+// [RULE] Import Safety:
+// 1. Ensure all imported names exist in 'deck.js' (export const).
+// 2. Mismatch leads to 'APP IMPORT FAIL'. Check RULES.md.
+
+// ... (Force Debug Module) ...
+
+// --- Utils ---
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function getTodayDateKey() {
+    const d = new Date();
+    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+}
+
+// Simple Hash (FNV-1a like)
+function hashStringToInt(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0);
+}
+
+function applyTemplate(str, vars = {}) {
+    if (typeof str !== "string") return str;
+    return str.replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? `{${k}}`));
+}
+
+function getProcessPoolByMode(mode) {
+    switch (mode) {
+        case "work":
+        case "仕事":
+        case "忍務":
+            return processesWork?.length ? processesWork : processes;
+
+        case "study":
+        case "学習":
+        case "修行":
+            return processesStudy?.length ? processesStudy : processes;
+
+        case "create":
+        case "創作":
+        case "秘術":
+            return processesCreate?.length ? processesCreate : processes;
+
+        case "rest":
+        case "休憩":
+        case "茶屋":
+            return processesRest?.length ? processesRest : processes;
+
+        case "move":
+        case "移動":
+        case "早馬":
+            return processesMove?.length ? processesMove : processes;
+
+        case "other":
+        case "その他":
+        case "不明":
+            return processesOther?.length ? processesOther : processes;
+
+        default:
+            return processes;
+    }
+}
+
+// ... (Navigation) ...
+
+// --- Logic ---
+function runGacha(entryId, dateKey, category) {
+    const seedStr = entryId + dateKey;
+    const seed = hashStringToInt(seedStr);
+
+    const sceneIndex = seed % scenes.length;
+
+    // Select Process Pool based on Category
+    const pool = getProcessPoolByMode(category);
+
+    // Use pool length for modulo
+    const processIndex = (seed * 7 + 13) % pool.length;
+
+    const sealIndex = (seed * 11 + 5) % seals.length;
+
+    // Plan A: Extra Seeded Metadata
+    const bannerIndex = (seed * 3 + 7) % raidBanners.length;
+    // SFX (3 distinct)
+    const sfx1 = sfxTags[(seed * 2 + 1) % sfxTags.length];
+    const sfx2 = sfxTags[(seed * 5 + 3) % sfxTags.length];
+    const sfx3 = sfxTags[(seed * 7 + 11) % sfxTags.length];
+
+    return {
+        scene: scenes[sceneIndex],
+        process: pool[processIndex], // Use selected pool
+        seal: seals[sealIndex],
+        seed: seed,
+        // New Props
+        banner: raidBanners[bannerIndex],
+        sfx: [sfx1, sfx2, sfx3]
+    };
+}
+
+function renderProcessSteps(steps, activity) {
+    const ol = document.getElementById("process-steps");
+    if (!ol) return;
+
+    ol.innerHTML = "";
+    const vars = { task: activity };
+
+    steps.slice(0, 3).forEach((s) => {
+        const li = document.createElement("li");
+        li.textContent = applyTemplate(s, vars);
+        ol.appendChild(li);
+    });
+}
+
+function renderResult(result, activity) {
+    // 1. Banner
+    document.getElementById('raid-banner').textContent = result.banner;
+
+    // 2. Seal
+    document.getElementById('seal-mark').textContent = result.seal;
+
+    // 3. Scene (with prefix)
+    document.getElementById('result-scene').textContent = "【乱入】" + result.scene.text;
+    document.getElementById('sfx-scene').textContent = result.sfx[0]; // SFX 1
+
+    // 4. Steps
+    renderProcessSteps(result.process.steps, activity);
+    document.getElementById('sfx-process').textContent = result.sfx[1]; // SFX 2
+
+    // 5. Ochi (Placeholder logic as consistent with previous step)
+    document.getElementById('result-och').textContent = "――此度もまた、記録に残らぬ戦いであった。";
+    document.getElementById('sfx-ochi').textContent = result.sfx[2]; // SFX 3
+}
+
+// ... (Debug Utils & Events) ...
+
+// 1. Entry -> Result (Delegated Event - The "断定テスト3")
+document.body.addEventListener('click', async (e) => {
+    // ... (Validation and Element Checks) ...
+    // Note: Assuming previous robust checks are preserved implicitly or replaced here. 
+    // Since this is a REPLACEMENT, I must include the surrounding code carefully or replace just the logic.
+    // The previous tool use implies I need to be careful with context. 
+    // I will use StartLine/EndLine relative to the file content viewed previously.
+    // Wait, the ReplacementContent above is missing the event listener implementation details!
+    // I should probably target specific functions to be safe, rather than a huge block.
+    // Splitting this into smaller replacements is safer.
+
+    // RE-PLANNING: I will split this replacement.
+    // 1. Update Imports
+    // 2. Add Helper Functions
+    // 3. Update runGacha signature and logic
+    // 4. Update renderResult logic
+
+    // This tool call is canceled. I will issue separate calls.
+    return;
+}
 
 // [RULE] Import Safety:
 // 1. Ensure all imported names exist in 'deck.js' (export const).
@@ -7,57 +185,57 @@ import { Storage } from './storage.js';
 
 // ===== FORCE DEBUG v2 (always visible) =====
 (() => {
-    const overlay = document.createElement("div");
-    overlay.id = "__force_debug_overlay__";
-    overlay.style.cssText = [
-        "position:fixed",
-        "top:6px",
-        "left:6px",
-        "z-index:2147483647",
-        "background:rgba(0,0,0,.88)",
-        "color:#ffe66d",
-        "padding:10px 12px",
-        "font:12px/1.35 monospace",
-        "border:1px solid rgba(255,230,109,.5)",
-        "border-radius:10px",
-        "white-space:pre",
-        "pointer-events:none",
-        "max-width:60vw",
-        "max-height:40vh",
-        "overflow:hidden"
-    ].join(";");
+        const overlay = document.createElement("div");
+        overlay.id = "__force_debug_overlay__";
+        overlay.style.cssText = [
+            "position:fixed",
+            "top:6px",
+            "left:6px",
+            "z-index:2147483647",
+            "background:rgba(0,0,0,.88)",
+            "color:#ffe66d",
+            "padding:10px 12px",
+            "font:12px/1.35 monospace",
+            "border:1px solid rgba(255,230,109,.5)",
+            "border-radius:10px",
+            "white-space:pre",
+            "pointer-events:none",
+            "max-width:60vw",
+            "max-height:40vh",
+            "overflow:hidden"
+        ].join(";");
 
-    const push = (msg) => {
-        overlay.textContent = msg + "\n" + overlay.textContent;
-        console.log("[FORCE]", msg);
-    };
+        const push = (msg) => {
+            overlay.textContent = msg + "\n" + overlay.textContent;
+            console.log("[FORCE]", msg);
+        };
 
-    const append = () => {
-        if (!document.getElementById("__force_debug_overlay__")) {
-            document.body.appendChild(overlay);
-        }
-    };
+        const append = () => {
+            if (!document.getElementById("__force_debug_overlay__")) {
+                document.body.appendChild(overlay);
+            }
+        };
 
-    if (document.body) append();
-    document.addEventListener("DOMContentLoaded", append);
+        if (document.body) append();
+        document.addEventListener("DOMContentLoaded", append);
 
-    push("FORCE DEBUG v2 LOADED");
+        push("FORCE DEBUG v2 LOADED");
 
-    document.addEventListener("click", (e) => {
-        const t = e.target;
-        push("CLICK: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
-    }, true);
+        document.addEventListener("click", (e) => {
+            const t = e.target;
+            push("CLICK: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
+        }, true);
 
-    document.addEventListener("pointerdown", (e) => {
-        const t = e.target;
-        push("POINTERDOWN: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
-    }, true);
+        document.addEventListener("pointerdown", (e) => {
+            const t = e.target;
+            push("POINTERDOWN: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
+        }, true);
 
-    window.addEventListener("error", (e) => push("ERROR: " + (e.message || e.type)));
-    window.addEventListener("unhandledrejection", (e) =>
-        push("REJECT: " + (e.reason?.message || e.reason))
-    );
-})();
+        window.addEventListener("error", (e) => push("ERROR: " + (e.message || e.type)));
+        window.addEventListener("unhandledrejection", (e) =>
+            push("REJECT: " + (e.reason?.message || e.reason))
+        );
+    })();
 
 // --- State ---
 const state = {
@@ -144,13 +322,17 @@ function showScreen(screenId) {
 }
 
 // --- Logic ---
-function runGacha(entryId, dateKey) {
+function runGacha(entryId, dateKey, category) {
     const seedStr = entryId + dateKey;
     const seed = hashStringToInt(seedStr);
 
     const sceneIndex = seed % scenes.length;
-    // processIndexは少しずらす
-    const processIndex = (seed * 7 + 13) % processes.length;
+
+    // Select Process Pool based on Category
+    const pool = getProcessPoolByMode(category);
+
+    // Use pool length for modulo
+    const processIndex = (seed * 7 + 13) % pool.length;
     const sealIndex = (seed * 11 + 5) % seals.length;
 
     // Plan A: Extra Seeded Metadata
@@ -162,7 +344,7 @@ function runGacha(entryId, dateKey) {
 
     return {
         scene: scenes[sceneIndex],
-        process: processes[processIndex],
+        process: pool[processIndex],
         seal: seals[sealIndex],
         seed: seed,
         // New Props
@@ -171,7 +353,21 @@ function runGacha(entryId, dateKey) {
     };
 }
 
-function renderResult(result) {
+function renderProcessSteps(steps, activity) {
+    const ol = document.getElementById("process-steps");
+    if (!ol) return;
+
+    ol.innerHTML = "";
+    const vars = { task: activity };
+
+    steps.slice(0, 3).forEach((s) => {
+        const li = document.createElement("li");
+        li.textContent = applyTemplate(s, vars);
+        ol.appendChild(li);
+    });
+}
+
+function renderResult(result, activity) {
     // 1. Banner
     document.getElementById('raid-banner').textContent = result.banner;
 
@@ -183,13 +379,7 @@ function renderResult(result) {
     document.getElementById('sfx-scene').textContent = result.sfx[0]; // SFX 1
 
     // 4. Steps
-    const stepsList = document.getElementById('result-steps');
-    stepsList.innerHTML = '';
-    result.process.steps.forEach(step => {
-        const li = document.createElement('li');
-        li.textContent = step;
-        stepsList.appendChild(li);
-    });
+    renderProcessSteps(result.process.steps, activity);
     document.getElementById('sfx-process').textContent = result.sfx[1]; // SFX 2
 
     // 5. Ochi (Placeholder logic as consistent with previous step)
@@ -250,11 +440,11 @@ document.body.addEventListener('click', async (e) => {
         const dateKey = getTodayDateKey();
 
         state.entryData = { id: entryId, activity, category, dateKey };
-        state.gachaResult = runGacha(entryId, dateKey);
+        state.gachaResult = runGacha(entryId, dateKey, category);
 
         debugLog("Logic: Render...");
         resetResultUI();
-        renderResult(state.gachaResult);
+        renderResult(state.gachaResult, activity);
 
         btn.innerHTML = originalText;
         btn.disabled = false;
