@@ -25,15 +25,16 @@
 
         <!-- Screen 1: 入力（Activity Entry） -->
         <section id="screen-entry" class="screen active">
-            <div class="intro-container">
-                <h1 class="main-title">秘伝・乱入之巻</h1>
-                <div class="seal-mark-input" id="seal-input">現場</div>
-
-                <!-- 朱印（角印）：忍者アイコンの代替 -->
-                <div class="shuin-stamp">
-                    <span class="shuin-text">乱入</span>
+            <!-- Hero Banner (Top Main Visual) -->
+            <div class="heroBanner" aria-label="Ninja main visual">
+                <div class="heroBanner__overlay"></div>
+                <div class="heroBanner__tag" aria-hidden="true">乱入</div>
+                <div class="heroBanner__titleWrap">
+                    <div class="heroBanner__title">秘伝・乱入之巻</div>
                 </div>
+            </div>
 
+            <div class="intro-container">
                 <!-- 3ステップ札 -->
                 <div class="step-cards">
                     <div class="step-card"><span class="step-num">①</span> 現場を記す</div>
@@ -218,7 +219,7 @@
     <script type="module">
         const push = window.__forcePush || ((m) => console.log(m));
         push("APP IMPORT START");
-        import('./js/app.js?v=20260118_force5')
+        import('./js/app.js?v=20260118_force6')
             .then(() => push("APP IMPORT OK"))
             .catch((err) => {
                 push("APP IMPORT FAIL: " + (err?.message || err));

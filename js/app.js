@@ -256,9 +256,7 @@ const screens = {
 
 // --- Init (Entry Screen) ---
 function initEntryScreen() {
-    // Random Seal for shuin stamp
-    const randomSeal = sealsInput[Math.floor(Math.random() * sealsInput.length)];
-    document.getElementById('seal-input').textContent = randomSeal;
+    // No random elements needed anymore (hero banner is static)
 }
 // Run on load
 initEntryScreen();

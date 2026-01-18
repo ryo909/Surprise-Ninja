@@ -126,8 +126,70 @@ body {
 
 /* Screen 1: Entry */
 #screen-entry {
-    padding: 40px 20px;
+    padding: 0 0 40px 0;
     text-align: center;
+}
+
+/* ===== Hero Banner ===== */
+.heroBanner {
+    position: relative;
+    width: 100%;
+    height: clamp(160px, 26vh, 260px);
+    overflow: hidden;
+
+    /* 画像を"帯"として見せる：coverでトリミング前提 */
+    background-image: url("../assets/ninja-banner.jpg?v=20260118_hero1");
+    background-size: cover;
+    background-position: center 30%;
+    background-repeat: no-repeat;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* 読みやすさ用：暗めグラデ＋軽い質感 */
+.heroBanner__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(120% 90% at 70% 20%, rgba(0, 0, 0, 0.10) 0%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.78) 100%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.65));
+    pointer-events: none;
+}
+
+/* タグ：押せそうに見せない＝小さく、角丸、薄め */
+.heroBanner__tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.85);
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(6px);
+    user-select: none;
+}
+
+/* タイトルをバナー内に置く */
+.heroBanner__titleWrap {
+    position: absolute;
+    right: 14px;
+    bottom: 12px;
+    z-index: 2;
+}
+
+.heroBanner__title {
+    font-family: var(--font-brush);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65);
 }
 
 .main-title {
@@ -402,7 +464,7 @@ body {
 }
 
 .intro-container {
-    padding-top: 20px;
+    padding: 20px 20px 0;
 }
 
 /* Button Subtext */
