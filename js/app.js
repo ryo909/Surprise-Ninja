@@ -400,46 +400,59 @@ document.getElementById('btn-toggle-shakyo').addEventListener('click', () => {
     }
 });
 
-// --- Force Click Logger (User Requested) ---
-(function forceClickLogger() {
-    // 画面左上に確実に出るデバッグ表示
-    let el = document.getElementById("debugOverlay");
-    if (!el) {
-        el = document.createElement("div");
-        el.id = "debugOverlay";
-        el.style.cssText =
-            "position:fixed;top:6px;left:6px;z-index:2147483647;" +
-            "background:rgba(0,0,0,.8);color:#00ff66;padding:6px 8px;" +
-            "font:12px/1.3 monospace;border:1px solid rgba(0,255,102,.4);" +
-            "border-radius:8px;white-space:pre;pointer-events:none;";
-        document.body.appendChild(el);
-    }
-    const w = (msg) => {
-        el.textContent = msg + "\n" + el.textContent;
-        console.log(msg);
+
+// ===== FORCE DEBUG v2 (always visible) =====
+(() => {
+    // 1) create overlay immediately
+    const overlay = document.createElement("div");
+    overlay.id = "__force_debug_overlay__";
+    overlay.style.cssText = [
+        "position:fixed",
+        "top:6px",
+        "left:6px",
+        "z-index:2147483647",
+        "background:rgba(0,0,0,.88)",
+        "color:#ffe66d",               // 既存の緑と差別化（黄）
+        "padding:10px 12px",
+        "font:12px/1.35 monospace",
+        "border:1px solid rgba(255,230,109,.5)",
+        "border-radius:10px",
+        "white-space:pre",
+        "pointer-events:none",
+        "max-width:60vw",
+        "max-height:40vh",
+        "overflow:hidden"
+    ].join(";");
+    const push = (msg) => {
+        overlay.textContent = msg + "\n" + overlay.textContent;
+        console.log("[FORCE]", msg);
     };
 
-    w("FORCE LOGGER LOADED");
+    // 2) append on DOM ready (and also try now)
+    const append = () => {
+        if (!document.getElementById("__force_debug_overlay__")) {
+            document.body.appendChild(overlay);
+        }
+    };
+    if (document.body) append();
+    document.addEventListener("DOMContentLoaded", append);
 
-    // クリックをキャプチャで必ず拾う
+    push("FORCE DEBUG v2 LOADED");
+
+    // 3) capture click / pointer
     document.addEventListener("click", (e) => {
         const t = e.target;
-        let id = "";
-        if (t && t.id) id = "#" + t.id;
-
-        let cls = "";
-        if (t && t.className && typeof t.className === 'string') {
-            cls = "." + t.className.split(" ").slice(0, 3).join(".");
-        }
-
-        w("DOC_CLICK " + (t?.tagName || "?") + id + cls);
+        push("CLICK: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
     }, true);
 
-    // タッチでも拾う（スマホ対策）
     document.addEventListener("pointerdown", (e) => {
         const t = e.target;
-        let id = "";
-        if (t && t.id) id = "#" + t.id;
-        w("POINTERDOWN " + (t?.tagName || "?") + id);
+        push("POINTERDOWN: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
     }, true);
+
+    // 4) errors
+    window.addEventListener("error", (e) => push("ERROR: " + (e.message || e.type)));
+    window.addEventListener("unhandledrejection", (e) =>
+        push("REJECT: " + (e.reason?.message || e.reason))
+    );
 })();
