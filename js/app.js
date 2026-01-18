@@ -60,10 +60,28 @@ function hashStringToInt(str) {
 
 // --- Navigation ---
 function showScreen(screenId) {
-    Object.values(screens).forEach(el => el.classList.remove('active'));
-    screens[screenId.replace('screen-', '')].classList.add('active');
+    // Debug
+    console.log(`Switching to screen: ${screenId}`);
+
+    // Strict display switching
+    Object.values(screens).forEach(el => {
+        el.classList.remove('active');
+        el.style.display = 'none'; // Force hide
+    });
+
+    const target = screens[screenId.replace('screen-', '')];
+    if (target) {
+        target.classList.add('active');
+        target.style.display = 'block'; // Force show
+
+        // Scroll to top
+        window.scrollTo(0, 0);
+        target.scrollIntoView({ behavior: 'auto', block: 'start' });
+    } else {
+        alert(`Error: Screen element not found for ${screenId}`);
+    }
+
     state.currentScreen = screenId;
-    window.scrollTo(0, 0);
 }
 
 // --- Logic ---
@@ -125,6 +143,8 @@ function renderResult(result) {
 // 1. Entry -> Result
 document.getElementById('btn-open-scroll').addEventListener('click', async (e) => {
     e.preventDefault();
+    // Debug Alert 1
+    // alert("DEBUG: Button clicked"); 
     console.log("Button clicked: btn-open-scroll");
 
     try {
@@ -135,6 +155,7 @@ document.getElementById('btn-open-scroll').addEventListener('click', async (e) =
 
         if (!activity) {
             console.warn("Validation failed: Empty activity");
+            alert("DEBUG: Validation failed (Empty)"); // Debug
             // UI Error Feedback
             activityInput.style.borderColor = "#db3b3b";
             activityInput.style.backgroundColor = "rgba(219, 59, 59, 0.1)";
@@ -160,6 +181,12 @@ document.getElementById('btn-open-scroll').addEventListener('click', async (e) =
 
         console.log("Starting transition timer...");
 
+        // Verify elements existence
+        if (!document.getElementById('screen-result')) {
+            alert("CRITICAL ERROR: Result screen DOM not found!");
+            return;
+        }
+
         // Delay for effect
         await new Promise(resolve => setTimeout(resolve, 400));
 
@@ -183,11 +210,12 @@ document.getElementById('btn-open-scroll').addEventListener('click', async (e) =
         renderResult(state.gachaResult);
 
         console.log("Showing Result Screen");
+        // alert("DEBUG: Transitioning to Result..."); // Debug
         showScreen('screen-result');
 
     } catch (err) {
         console.error("Error in btn-open-scroll handler:", err);
-        alert("エラーが発生しました: " + err.message);
+        alert("JS ERROR: " + err.message);
         // Recovery
         const btn = document.getElementById('btn-open-scroll');
         if (btn) btn.disabled = false;
