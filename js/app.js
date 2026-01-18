@@ -399,3 +399,47 @@ document.getElementById('btn-toggle-shakyo').addEventListener('click', () => {
         document.getElementById('shakyo-log-id').textContent = currentLogId;
     }
 });
+
+// --- Force Click Logger (User Requested) ---
+(function forceClickLogger() {
+    // 画面左上に確実に出るデバッグ表示
+    let el = document.getElementById("debugOverlay");
+    if (!el) {
+        el = document.createElement("div");
+        el.id = "debugOverlay";
+        el.style.cssText =
+            "position:fixed;top:6px;left:6px;z-index:2147483647;" +
+            "background:rgba(0,0,0,.8);color:#00ff66;padding:6px 8px;" +
+            "font:12px/1.3 monospace;border:1px solid rgba(0,255,102,.4);" +
+            "border-radius:8px;white-space:pre;pointer-events:none;";
+        document.body.appendChild(el);
+    }
+    const w = (msg) => {
+        el.textContent = msg + "\n" + el.textContent;
+        console.log(msg);
+    };
+
+    w("FORCE LOGGER LOADED");
+
+    // クリックをキャプチャで必ず拾う
+    document.addEventListener("click", (e) => {
+        const t = e.target;
+        let id = "";
+        if (t && t.id) id = "#" + t.id;
+
+        let cls = "";
+        if (t && t.className && typeof t.className === 'string') {
+            cls = "." + t.className.split(" ").slice(0, 3).join(".");
+        }
+
+        w("DOC_CLICK " + (t?.tagName || "?") + id + cls);
+    }, true);
+
+    // タッチでも拾う（スマホ対策）
+    document.addEventListener("pointerdown", (e) => {
+        const t = e.target;
+        let id = "";
+        if (t && t.id) id = "#" + t.id;
+        w("POINTERDOWN " + (t?.tagName || "?") + id);
+    }, true);
+})();
