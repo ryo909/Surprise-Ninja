@@ -281,76 +281,12 @@ function showScreen(screenId) {
     state.currentScreen = screenId;
 }
 
-// --- Logic ---
-function runGacha(entryId, dateKey, category) {
-    const seedStr = entryId + dateKey;
-    const seed = hashStringToInt(seedStr);
-
-    const sceneIndex = seed % scenes.length;
-
-    // Select Process Pool based on Category
-    const pool = getProcessPoolByMode(category);
-
-    // Use pool length for modulo
-    const processIndex = (seed * 7 + 13) % pool.length;
-    const sealIndex = (seed * 11 + 5) % seals.length;
-
-    // Plan A: Extra Seeded Metadata
-    const bannerIndex = (seed * 3 + 7) % raidBanners.length;
-    // SFX (3 distinct)
-    const sfx1 = sfxTags[(seed * 2 + 1) % sfxTags.length];
-    const sfx2 = sfxTags[(seed * 5 + 3) % sfxTags.length];
-    const sfx3 = sfxTags[(seed * 7 + 11) % sfxTags.length];
-
-    return {
-        scene: scenes[sceneIndex],
-        process: pool[processIndex],
-        seal: seals[sealIndex],
-        seed: seed,
-        // New Props
-        banner: raidBanners[bannerIndex],
-        sfx: [sfx1, sfx2, sfx3]
-    };
-}
-
-function renderProcessSteps(steps, activity) {
-    const ol = document.getElementById("process-steps");
-    if (!ol) return;
-
-    ol.innerHTML = "";
-    const vars = { task: activity };
-
-    steps.slice(0, 3).forEach((s) => {
-        const li = document.createElement("li");
-        li.textContent = applyTemplate(s, vars);
-        ol.appendChild(li);
-    });
-}
-
-function renderResult(result, activity) {
-    // 1. Banner
-    document.getElementById('raid-banner').textContent = result.banner;
-
-    // 2. Seal
-    document.getElementById('seal-mark').textContent = result.seal;
-
-    // 3. Scene (with prefix)
-    document.getElementById('result-scene').textContent = "【乱入】" + result.scene.text;
-    document.getElementById('sfx-scene').textContent = result.sfx[0]; // SFX 1
-
-    // 4. Steps
-    renderProcessSteps(result.process.steps, activity);
-    document.getElementById('sfx-process').textContent = result.sfx[1]; // SFX 2
-
-    // 5. Ochi (Placeholder logic as consistent with previous step)
-    document.getElementById('result-och').textContent = "――此度もまた、記録に残らぬ戦いであった。";
-    document.getElementById('sfx-ochi').textContent = result.sfx[2]; // SFX 3
-}
 
 // --- Debug Utils ---
 function debugLog(msg) {
     console.log("[DEBUG]", msg);
 }
+
 
 
 
