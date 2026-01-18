@@ -141,23 +141,9 @@ function renderResult(result) {
 
 // --- Debug Utils ---
 function debugLog(msg) {
-    const el = document.getElementById('debug-console');
-    if (el) {
-        const time = new Date().toLocaleTimeString();
-        el.innerHTML = `[${time}] ${msg}<br>` + el.innerHTML;
-    }
-    console.log(msg);
+    console.log("[DEBUG]", msg);
 }
 
-// Log Load
-window.addEventListener('DOMContentLoaded', () => {
-    debugLog(`Loaded: v=${new Date().toISOString()}`);
-});
-
-// GLOBAL CLICK CAPTURE (The "断定テスト2")
-document.addEventListener('click', (e) => {
-    debugLog(`DOC_CLICK: ${e.target.tagName} #${e.target.id} .${e.target.className}`);
-}, true); // Capture phase
 
 
 // 1. Entry -> Result (Delegated Event - The "断定テスト3")
@@ -401,58 +387,4 @@ document.getElementById('btn-toggle-shakyo').addEventListener('click', () => {
 });
 
 
-// ===== FORCE DEBUG v2 (always visible) =====
-(() => {
-    // 1) create overlay immediately
-    const overlay = document.createElement("div");
-    overlay.id = "__force_debug_overlay__";
-    overlay.style.cssText = [
-        "position:fixed",
-        "top:6px",
-        "left:6px",
-        "z-index:2147483647",
-        "background:rgba(0,0,0,.88)",
-        "color:#ffe66d",               // 既存の緑と差別化（黄）
-        "padding:10px 12px",
-        "font:12px/1.35 monospace",
-        "border:1px solid rgba(255,230,109,.5)",
-        "border-radius:10px",
-        "white-space:pre",
-        "pointer-events:none",
-        "max-width:60vw",
-        "max-height:40vh",
-        "overflow:hidden"
-    ].join(";");
-    const push = (msg) => {
-        overlay.textContent = msg + "\n" + overlay.textContent;
-        console.log("[FORCE]", msg);
-    };
 
-    // 2) append on DOM ready (and also try now)
-    const append = () => {
-        if (!document.getElementById("__force_debug_overlay__")) {
-            document.body.appendChild(overlay);
-        }
-    };
-    if (document.body) append();
-    document.addEventListener("DOMContentLoaded", append);
-
-    push("FORCE DEBUG v2 LOADED");
-
-    // 3) capture click / pointer
-    document.addEventListener("click", (e) => {
-        const t = e.target;
-        push("CLICK: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
-    }, true);
-
-    document.addEventListener("pointerdown", (e) => {
-        const t = e.target;
-        push("POINTERDOWN: " + (t?.tagName || "?") + (t?.id ? "#" + t.id : ""));
-    }, true);
-
-    // 4) errors
-    window.addEventListener("error", (e) => push("ERROR: " + (e.message || e.type)));
-    window.addEventListener("unhandledrejection", (e) =>
-        push("REJECT: " + (e.reason?.message || e.reason))
-    );
-})();
