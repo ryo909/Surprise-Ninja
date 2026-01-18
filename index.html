@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,14 +8,16 @@
     <!-- Google Fonts: 筆文字や和風明朝体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Yuji+Syuku&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Yuji+Syuku&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
     <!-- アプリ全体を包むコンテナ -->
     <div id="app">
-        
+
         <!-- Screen 1: 入力（Activity Entry） -->
         <section id="screen-entry" class="screen active">
             <div class="intro-container">
@@ -41,7 +44,7 @@
                 </div>
 
                 <button id="btn-open-scroll" class="btn-primary">巻物を開く</button>
-                
+
                 <div class="footer-link">
                     <button id="btn-view-archive-from-entry" class="btn-text">古き巻物を見る（履歴）</button>
                 </div>
@@ -52,7 +55,7 @@
         <section id="screen-result" class="screen">
             <!-- 忍者メインビジュアル -->
             <div class="visual-area">
-                <img src="assets/ninja.png" alt="Ninja Visual" class="ninja-img">
+                <img src="assets/ninja.png?v=2" alt="Ninja Visual" class="ninja-img">
                 <div class="visual-gradient"></div>
             </div>
 
@@ -63,7 +66,7 @@
                         <h2 class="scroll-title">秘伝・乱入之巻</h2>
                         <div id="seal-mark" class="seal-mark">極秘</div>
                     </div>
-                    
+
                     <div class="scroll-body">
                         <!-- 1. 口上 -->
                         <div class="section-title">口上</div>
@@ -88,8 +91,10 @@
                         <div id="judgment-area">
                             <div class="section-title">判定</div>
                             <div class="buttons-vertical">
-                                <button id="btn-yes" class="btn-judgement btn-yes">面白くなる<span class="sub-text">（開帳）</span></button>
-                                <button id="btn-no" class="btn-judgement btn-no">台無し<span class="sub-text">（封印）</span></button>
+                                <button id="btn-yes" class="btn-judgement btn-yes">面白くなる<span
+                                        class="sub-text">（開帳）</span></button>
+                                <button id="btn-no" class="btn-judgement btn-no">台無し<span
+                                        class="sub-text">（封印）</span></button>
                             </div>
 
                             <!-- スライダーエリア（判定後に表示） -->
@@ -99,9 +104,9 @@
                                     <span id="slider-value">50</span>/100
                                 </div>
                                 <input type="range" id="intensity-slider" min="0" max="100" value="50">
-                                
+
                                 <textarea id="result-note" placeholder="一言メモ（任意）" rows="2"></textarea>
-                                
+
                                 <button id="btn-save" class="btn-primary btn-save">巻物に刻む</button>
                                 <button id="btn-cancel-choice" class="btn-text-small">選択解除</button>
                             </div>
@@ -117,7 +122,7 @@
                             <button id="btn-retry" class="btn-secondary">次の乱入を召喚</button>
                             <button id="btn-view-archive" class="btn-text">巻物庫を開く</button>
                         </div>
-                        
+
                         <!-- 写経モード時のみ表示 -->
                         <div id="shakyo-footer" class="shakyo-footer hidden">
                             — 秘伝・乱入之巻 / 記録番号: <span id="shakyo-log-id">0000</span> —
@@ -139,7 +144,7 @@
                 <h2>巻物庫</h2>
                 <button id="btn-back-to-entry" class="btn-text">戻る</button>
             </header>
-            
+
             <div id="archive-list" class="archive-list">
                 <!-- JSでリスト生成 -->
                 <div class="empty-state">まだ巻物は存在せぬ。</div>
@@ -151,4 +156,5 @@
     <!-- Scripts -->
     <script type="module" src="js/app.js"></script>
 </body>
+
 </html>
