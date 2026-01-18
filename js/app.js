@@ -252,28 +252,7 @@ function initEntryScreen() {
 initEntryScreen();
 
 
-// --- Utils ---
-function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
 
-function getTodayDateKey() {
-    const d = new Date();
-    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
-}
-
-// Simple Hash (FNV-1a like)
-function hashStringToInt(str) {
-    let h = 2166136261;
-    for (let i = 0; i < str.length; i++) {
-        h ^= str.charCodeAt(i);
-        h = Math.imul(h, 16777619);
-    }
-    return (h >>> 0);
-}
 
 // --- Navigation ---
 function showScreen(screenId) {
