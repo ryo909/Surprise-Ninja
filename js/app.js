@@ -1,6 +1,9 @@
 import { seals, scenes, processes, raidBanners, fieldMantras, sfxTags, activityPlaceholders, sealsInput } from './deck.js';
 import { Storage } from './storage.js';
 
+// [RULE] Import Safety:
+// 1. Ensure all imported names exist in 'deck.js' (export const).
+// 2. Mismatch leads to 'APP IMPORT FAIL'. Check RULES.md.
 
 // ===== FORCE DEBUG v2 (always visible) =====
 (() => {

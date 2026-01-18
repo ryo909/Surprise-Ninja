@@ -1,5 +1,10 @@
 // 忍者ガチャデータ
 
+// [RULE] Data Centralization:
+// 1. ALL data arrays/dicts must be exported as 'export const'.
+// 2. NO 'export default'.
+// 3. If you add an export here, update import in app.js.
+
 export const seals = ["極秘", "忍務", "禁術", "至急", "乱入", "破戒", "不可避", "侵入", "突入", "警報", "現場", "緊急"];
 
 export const scenes = [

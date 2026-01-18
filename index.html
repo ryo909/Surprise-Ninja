@@ -212,7 +212,10 @@
         push("APP IMPORT START");
         import("./js/app.js?v=" + Date.now())
             .then(() => push("APP IMPORT OK"))
-            .catch((err) => push("APP IMPORT FAIL: " + (err?.message || err)));
+            .catch((err) => {
+                push("APP IMPORT FAIL: " + (err?.message || err));
+                push("HINT: Check 'deck.js' exports vs 'app.js' imports.");
+            });
     </script>
 </body>
 
